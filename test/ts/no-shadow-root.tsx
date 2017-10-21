@@ -1,8 +1,19 @@
-import { withComponent, define } from 'skatejs'
+import { withComponent, define, Renderer } from 'skatejs'
 
-const withRenderer = () => class extends HTMLElement {}
-export const Component = withComponent(withRenderer())
+const withCustomRendererAsString = () =>
+  class<P> extends HTMLElement implements Renderer<P, string> {
+    rendererCallback(shadowRoot: HTMLElement, renderCallback: () => string): void {
+      // erease content && re-render
+      shadowRoot.innerHTML = renderCallback()
+    }
+  }
+export const Component = withComponent(withCustomRendererAsString())
 
+export class Shadowless<P = object> extends Component<P> {
+  get renderRoot() {
+    return this
+  }
+}
 export class MyComponent extends Component {
   static readonly is = 'my-cmp'
   get renderRoot() {
@@ -16,5 +27,16 @@ export class MyComponent extends Component {
     `
   }
 }
+define(MyComponent)
 
-export default define(MyComponent)
+export class NoShadowCmp extends Shadowless {
+  static readonly is = 'my-noshadow-cmp'
+  renderCallback() {
+    return `
+      <div>
+        <h1>Hello World</h1>
+      </div>
+    `
+  }
+}
+define(NoShadowCmp)

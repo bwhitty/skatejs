@@ -6,7 +6,7 @@ const Component = withComponent()
 export type NumLiteral = 123 | 124 | 125
 export type StrLiteral = 'one' | 'two' | 'three'
 export type SkateType = { trucks: string; deck: string }
-export interface CountUpProps {
+export type CountUpProps = {
   count?: number
   num?: number
   numLiteral?: NumLiteral
@@ -18,28 +18,25 @@ export interface CountUpProps {
 }
 
 export class CountUpComponent extends Component<CountUpProps> {
-  static get is() {
-    return 'x-countup'
-  }
-  static get props(): ComponentProps<CountUpComponent, CountUpProps> {
-    return {
-      count: {
-        ...props.number,
-        ...{
-          attribute: true,
-          default(elem: HTMLElement, data: Object) {
-            return 7
-          },
+  static is = 'x-countup'
+
+  static props: ComponentProps<CountUpProps, CountUpComponent> = {
+    count: {
+      ...props.number,
+      ...{
+        attribute: true,
+        default(elem: HTMLElement, data: Object) {
+          return 7
         },
       },
-      num: props.number,
-      numLiteral: props.number,
-      str: props.string,
-      strLiteral: props.string,
-      bool: props.boolean,
-      arr: props.array,
-      obj: props.object,
-    }
+    },
+    num: props.number,
+    numLiteral: props.number,
+    str: props.string,
+    strLiteral: props.string,
+    bool: props.boolean,
+    arr: props.array,
+    obj: props.object,
   }
 
   count: number
@@ -61,14 +58,10 @@ customElements.define(CountUpComponent.is, CountUpComponent)
 
 type SkateParkProps = { year: number; halfPipe: boolean }
 class SkatePark extends Component<SkateParkProps> {
-  static get is() {
-    return 'my-skate-park'
-  }
-  static get props(): skate.ComponentProps<SkatePark, SkateParkProps> {
-    return {
-      year: props.number,
-      halfPipe: props.boolean,
-    }
+  static is = 'my-skate-park'
+  static props: skate.ComponentProps<SkateParkProps, SkatePark> = {
+    year: props.number,
+    halfPipe: props.boolean,
   }
   renderCallback({ halfPipe, year }: SkateParkProps) {
     const halfPipeInfo = <span>{halfPipe ? 'has' : 'doesnt have'}</span>
@@ -97,13 +90,11 @@ customElements.define(
   }
 )
 
-export type ElmProps = { str: string; arr: any[] }
-class Elem extends Component<ElmProps> {
-  static get props(): ComponentProps<Elem, ElmProps> {
-    return {
-      str: props.string,
-      arr: props.array,
-    }
+export type ElemProps = { str: string; arr: any[] }
+class Elem extends Component<ElemProps> {
+  static props: ComponentProps<ElemProps, Elem> = {
+    str: props.string,
+    arr: props.array,
   }
 
   str: string

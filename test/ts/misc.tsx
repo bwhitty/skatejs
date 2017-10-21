@@ -1,6 +1,7 @@
+// import {  } from 'skatejs'
 const h = preact.h
 
-const { withComponent, emit, link, define } = skate
+const { withComponent, emit, link, define, props } = skate
 type ComponentProps<E, T> = skate.ComponentProps<E, T>
 type PreactComponentProps = preact.ComponentProps<any>
 type SFC<P> = P & PreactComponentProps
@@ -11,10 +12,8 @@ const Component = withComponent()
     'x-hello',
     class extends Component<{ name: string }> {
       name: string
-      static get props() {
-        return {
-          name: { attribute: true },
-        }
+      static props = {
+        name: { attribute: true },
       }
       renderCallback() {
         return h('div', {}, `Hello, ${this.name}`)
@@ -27,12 +26,10 @@ const Component = withComponent()
   customElements.define(
     'x-counter',
     class extends Component<{ count: number }> {
-      static get props(): ComponentProps<any, { count: number }> {
-        return {
-          // By declaring the property an attribute, we can now pass an initial value
-          // for the count as part of the HTML.
-          count: { ...skate.props.number, ...{ attribute: true } },
-        }
+      static props: ComponentProps<any, { count: number }> = {
+        // By declaring the property an attribute, we can now pass an initial value
+        // for the count as part of the HTML.
+        count: { ...skate.props.number, ...{ attribute: true } },
       }
 
       count: number
@@ -57,17 +54,6 @@ const Component = withComponent()
       }
       renderCallback() {
         return h('div', {}, `Count ${this.count}`)
-      }
-    }
-  )
-}
-{
-  // https://github.com/skatejs/skatejs#constructor---supersedes-static-created
-  customElements.define(
-    'my-component',
-    class extends Component<any> {
-      constructor() {
-        super()
       }
     }
   )
@@ -101,47 +87,22 @@ const Component = withComponent()
     class extends Component {
       static get observedAttributes() {
         // return super.observedAttributes.concat('my-attribute');
-        return (Component as any).observedAttributes.concat('my-attribute')
+        return ((Component as any) as typeof skate.CustomElement).observedAttributes.concat('my-attribute')
       }
     }
   )
 }
 {
-  // https://github.com/skatejs/skatejs#static-props
-  customElements.define(
-    'my-component',
-    class extends Component<{}> {
-      static get props() {
-        return {}
-      }
-    }
-  )
-}
-{
-  // https://github.com/skatejs/skatejs#attribute
-  customElements.define(
-    'my-component',
-    class extends Component<any> {
-      static get props() {
-        return {
-          myProp: { attribute: true },
-        }
-      }
-    }
-  )
-
-  class MyCmp extends Component<any> {
-    static get props() {
-      return {
-        myProp: {
-          attribute: {
-            // set propert from my-prop attribute on element
-            source: true,
-            // reflect property value to different-prop on element
-            target: 'differentProp',
-          },
+  class MyCmp extends Component {
+    static props = {
+      myProp: {
+        attribute: {
+          // set propert from my-prop attribute on element
+          source: true,
+          // reflect property value to different-prop on element
+          target: 'differentProp',
         },
-      }
+      },
     }
   }
 }
@@ -150,14 +111,12 @@ const Component = withComponent()
   customElements.define(
     'my-component',
     class extends Component<{ myProp: any }> {
-      static get props() {
-        return {
-          myProp: {
-            coerce(value: any) {
-              return value
-            },
+      static props = {
+        myProp: {
+          coerce(value: any) {
+            return value
           },
-        }
+        },
       }
     }
   )
@@ -167,12 +126,10 @@ const Component = withComponent()
   customElements.define(
     'my-component',
     class extends Component<{ myProp: any }> {
-      static get props() {
-        return {
-          myProp: {
-            default: 'default value',
-          },
-        }
+      static props = {
+        myProp: {
+          default: 'default value',
+        },
       }
     }
   )
@@ -180,14 +137,12 @@ const Component = withComponent()
   customElements.define(
     'my-component',
     class B extends Component<{ myProp: any }> {
-      static get props() {
-        return {
-          myProp: {
-            default(elem: B, data: string) {
-              return []
-            },
+      static props = {
+        myProp: {
+          default(elem: B, data: string) {
+            return []
           },
-        }
+        },
       }
     }
   )
@@ -197,14 +152,12 @@ const Component = withComponent()
   customElements.define(
     'my-component',
     class extends Component<{ myProp: any }> {
-      static get props() {
-        return {
-          myProp: {
-            deserialize(value: string) {
-              return value.split(',')
-            },
+      static props = {
+        myProp: {
+          deserialize(value: string) {
+            return value.split(',')
           },
-        }
+        },
       }
     }
   )
@@ -214,14 +167,12 @@ const Component = withComponent()
   customElements.define(
     'my-component',
     class extends Component<{ myProp: any }> {
-      static get props() {
-        return {
-          myProp: {
-            serialize(value: string[]) {
-              return value.join(',')
-            },
+      static props = {
+        myProp: {
+          serialize(value: string[]) {
+            return value.join(',')
           },
-        }
+        },
       }
     }
   )
@@ -230,7 +181,7 @@ const Component = withComponent()
   // https://github.com/skatejs/skatejs#prototype
   customElements.define(
     'my-component',
-    class extends Component<any> {
+    class extends Component {
       get someProperty() {
         return 1
       }
@@ -243,7 +194,7 @@ const Component = withComponent()
   // https://github.com/skatejs/skatejs#updatedcallback---supersedes-static-updated
   customElements.define(
     'x-component',
-    class extends Component<any> {
+    class extends Component {
       updatedCallback(previousProps: any) {
         // The previous props will not be defined if it is the initial render.
         if (!previousProps) {
@@ -264,11 +215,9 @@ const Component = withComponent()
 
   type ElemProps = { str: string; arr: string[] }
   class Elem extends Component<ElemProps> {
-    static get props(): ComponentProps<Elem, ElemProps> {
-      return {
-        str: skate.props.string,
-        arr: skate.props.array,
-      }
+    static props: ComponentProps<ElemProps, Elem> = {
+      str: skate.props.string,
+      arr: skate.props.array,
     }
 
     str: string
@@ -308,17 +257,15 @@ const Component = withComponent()
 
   customElements.define(
     'my-component',
-    class extends Component<any> {
-      static get props() {
-        return {
-          name: skate.props.string,
-        }
+    class extends Component {
+      static props = {
+        name: props.string,
       }
 
       name: string
 
-      updatedCallback(prev: any) {
-        if (prev.name !== this.name) {
+      propsUpdatedCallback(next: any, prev: any) {
+        if (next.name !== prev.name) {
           emit(this, 'name-changed', { detail: prev })
         }
       }
@@ -329,7 +276,7 @@ const Component = withComponent()
   // https://github.com/skatejs/skatejs#rendercallback---supersedes-static-render
   customElements.define(
     'my-component',
-    class extends Component<any> {
+    class extends Component {
       renderCallback() {
         return h('p', {}, `My name is ${this.tagName}.`)
       }
@@ -338,7 +285,7 @@ const Component = withComponent()
 
   customElements.define(
     'my-component',
-    class extends Component<any> {
+    class extends Component {
       renderCallback() {
         return <span>h('paragraph 1'), h('paragraph 2'),</span>
       }
@@ -374,13 +321,9 @@ const Component = withComponent()
 
   const SkateCtor = define(
     class extends Component<{ who: string }> {
-      static get is() {
-        return 'my-skate'
-      }
-      static get props() {
-        return {
-          who: skate.props.string,
-        }
+      static is = 'my-skate'
+      static props = {
+        who: skate.props.string,
       }
       who: string
     }
@@ -393,7 +336,7 @@ const Component = withComponent()
   // https://github.com/skatejs/skatejs#emit-elem-eventname-eventoptions--
   customElements.define(
     'x-tabs',
-    class extends Component<any> {
+    class extends Component {
       renderCallback() {
         return h('x-tab', { onSelect: () => {} })
       }
@@ -402,7 +345,7 @@ const Component = withComponent()
 
   customElements.define(
     'x-tab',
-    class extends Component<any> {
+    class extends Component {
       renderCallback() {
         return h('a', { onClick: () => emit(this, 'select') })
       }
@@ -411,16 +354,16 @@ const Component = withComponent()
 }
 {
   // https://github.com/skatejs/skatejs#preventing-bubbling-or-canceling
-  let elem: typeof Component = null as any
+  let elem = new Component()
+
   emit(elem, 'event', {
     composed: false,
     bubbles: false,
     cancelable: false,
   })
-}
-{
+
   // https://github.com/skatejs/skatejs#passing-data
-  let elem: typeof Component = null as any
+  // let elem: typeof Component = null as any
   emit(elem, 'event', {
     detail: {
       data: 'my-data',
@@ -432,10 +375,8 @@ const Component = withComponent()
   customElements.define(
     'my-input',
     class extends Component<{ value: any }> {
-      static get props() {
-        return {
-          value: { attribute: true },
-        }
+      static props = {
+        value: { attribute: true },
       }
       renderCallback(): any {
         return h('input', { onChange: link(this, 'value'), type: 'text' })
@@ -446,10 +387,8 @@ const Component = withComponent()
   customElements.define(
     'my-input',
     class extends Component<{ value: any }> {
-      static get props() {
-        return {
-          value: { attribute: true },
-        }
+      static props = {
+        value: { attribute: true },
       }
       renderCallback(): any {
         const linkedInput = h('input', {
@@ -500,14 +439,8 @@ const Component = withComponent()
 // #prop
 // ====================================================================
 {
-  skate.props.boolean
-  skate.props.string
-  skate.props.number
-  skate.props.array
-  skate.props.object
-
   const customProp = {
-    ...skate.props.boolean,
+    ...props.boolean,
     ...{
       coerce() {
         // coerce it differently than the default way
@@ -518,24 +451,18 @@ const Component = withComponent()
 
   type UserModel = { id: number; email: string }
   class User extends Component<{ user: UserModel }> {
-    static get is() {
-      return 'my-user'
-    }
-    static get props() {
-      return {
-        user: {
-          ...skate.props.object,
-          ...{
-            default: { id: -1, email: '' },
-          },
+    static is = 'my-user'
+    static props = {
+      user: {
+        ...skate.props.object,
+        ...{
+          default: { id: -1, email: '' },
         },
-      }
+      },
     }
-
-    user: UserModel
 
     renderCallback() {
-      const { id, email } = this.user
+      const { id, email } = this.props.user
       return (
         <p>
           <div>ID: {id}</div>
@@ -546,59 +473,29 @@ const Component = withComponent()
   }
 
   class UserList extends Component<{ users: UserModel[] }> {
-    static get is() {
-      return 'my-user-list'
+    static is = 'my-user-list'
+    static props = {
+      users: skate.props.array,
     }
-    static get props() {
-      return {
-        users: skate.props.array,
-      }
-    }
-
-    users: UserModel[]
 
     renderCallback() {
-      const { users } = this
+      const { users } = this.props
       return <ul>{users.map(user => <li>{h('my-user', { user })}</li>)}</ul>
     }
   }
-}
-{
-  // https://github.com/skatejs/skatejs#h
-  customElements.define(
-    'my-component',
-    class extends Component<any> {
-      renderCallback() {
-        return h('p', { style: { fontWeight: 'bold' } }, 'Hello!')
-      }
-    }
-  )
-}
-{
-  // https://github.com/skatejs/skatejs#jsx
-  customElements.define(
-    'my-component',
-    class extends Component<any> {
-      renderCallback() {
-        return <p>Hello!</p>
-      }
-    }
-  )
 }
 {
   // https://github.com/skatejs/skatejs#other-ways-to-use-jsx
   customElements.define(
     'my-component',
     class extends Component<{ title: string }> {
-      static get props() {
-        return {
-          title: skate.props.string,
-        }
+      static props = {
+        title: skate.props.string,
       }
       renderCallback() {
         return (
           <div>
-            <h1>{this.title}</h1>
+            <h1>{this.props.title}</h1>
             {h('slot', { name: 'description' })}
 
             <article>{h('slot', {})}</article>
@@ -610,7 +507,7 @@ const Component = withComponent()
 }
 {
   // https://github.com/skatejs/skatejs#component-constructor
-  class MyElement extends Component<any> {}
+  class MyElement extends Component {}
   customElements.define('my-element', MyElement)
 
   // Renders <my-element />
@@ -621,70 +518,16 @@ const Component = withComponent()
   h('my-element', { ...anyProps })
 }
 {
-  // https://github.com/skatejs/skatejs#function-helper
-  {
-    const MyElement = () => h('div', {}, 'Hello, World!')
-
-    // Renders <div>Hello, World!</div>
-    h('my-element', {})
-  }
-  {
-    const MyElement = (props: { name: string }) => h('div', {}, `Hello, ${props.name}!`)
-
-    // Renders <div>Hello, Bob!</div>
-    h('my-element', { name: 'Bob' })
-  }
-  {
-    const MyElement = (props: void, children: string) => h('div', {}, 'Hello, ', children, '!')
-
-    // Renders <div>Hello, Mary!</div>
-    h('my-element', {}, 'Mary')
-  }
-  {
-    const MyElement = (props: any, children: Node) => <div>Hello, {children}!</div>
-
-    // Renders <div>Hello, Mary!</div>
-    ;<MyElement>123</MyElement>
-  }
-}
-{
-  // https://github.com/skatejs/skatejs#special-attributes
-  {
-    h('ul', h('li', { key: '0' }), h('li', { key: '1' }))
-
-    const ArrayCmp = () => (
-      <ul>
-        <li key={'0'} />
-        <li key={'1'} />
-      </ul>
-    )
-  }
-
-  {
-    const onClick = console.log
-    h('button', { onClick })
-    h('button', { 'on-click': onClick })
-
-    h('button', { onclick: onClick })
-
-    const TestCmp = () => (
-      <div>
-        <button onClick={onClick} />
-        <button onClick={onClick} />
-      </div>
-    )
-  }
-
   {
     customElements.define(
       'my-element',
-      class extends Component<any> {
+      class extends Component {
         constructor() {
           super()
           this.addEventListener('change', this.handleChange)
         }
 
-        handleChange(e: any) {
+        handleChange(this: typeof Component, e: UIEvent) {
           // `this` is the element.
           // The event is passed as the only argument.
         }
@@ -692,76 +535,6 @@ const Component = withComponent()
     )
   }
 
-  {
-    const ref = (button: HTMLButtonElement) => button.addEventListener('click', console.log)
-    h('button', { ref })
-
-    const TestCmp = () => <button ref={ref} />
-  }
-  {
-    const ref = console.log
-    customElements.define(
-      'my-element',
-      class extends Component<any> {
-        renderCallback() {
-          return h('div', { ref })
-        }
-      }
-    )
-
-    class TestCmp extends Component<any> {
-      renderCallback() {
-        return <div ref={ref} />
-      }
-    }
-  }
-  {
-    customElements.define(
-      'my-element',
-      class extends Component<any> {
-        renderCallback() {
-          const ref = console.log
-          return h('div', { ref })
-        }
-      }
-    )
-  }
-  {
-    h('div', {
-      ref: (e: HTMLElement) => (e.innerHTML = "<p>oh no you didn't</p>"),
-      skip: true,
-    })
-
-    class TestCmp extends Component<any> {
-      renderCallback() {
-        return (
-          <div
-            ref={(e: HTMLElement) => (e.innerHTML = "<p>oh no you didn't</p>")}
-            // skip
-          />
-        )
-      }
-    }
-  }
-  {
-    h('div', { statics: ['attr1', 'prop2'] })
-
-    class TestCmp extends Component {
-      renderCallback() {
-        // return <div statics={['attr1', 'prop2']}></div>
-        return ''
-      }
-    }
-  }
-  {
-    h('div', { class: 'c-button c-button--block' })
-
-    class TestCmp extends Component<any> {
-      renderCallback() {
-        return <div class="c-button c-button--block" />
-      }
-    }
-  }
   // anchor test so this https://github.com/Microsoft/TypeScript/issues/13345 is mitigated
   {
     const Link = ({ to }: { to: string }) => <a href={to}>{h('slot', {})}</a>
@@ -779,10 +552,8 @@ const Component = withComponent()
     const Body: SFCSlotRef<HTMLSpanElement> = props => <span {...props}>Hey yo body!</span>
     const Footer: SFCSlotRef<HTMLSpanElement> = props => <span {...props}>Footer baby</span>
 
-    class Menu extends Component<void> {
-      static get is() {
-        return 'my-menu'
-      }
+    class Menu extends Component {
+      static readonly is = 'my-menu'
       private menu = [{ link: 'home', name: 'Home' }, { link: 'about', name: 'About' }]
       renderCallback() {
         return (
@@ -797,16 +568,12 @@ const Component = withComponent()
       }
     }
     class Page extends Component<void> {
-      static get is() {
-        return 'my-page'
-      }
-      static get slots() {
-        return {
-          header: 'header',
-          body: 'body',
-          footer: 'footer',
-          menu: 'menu',
-        }
+      static readonly is = 'my-page'
+      static readonly slots = {
+        header: 'header',
+        body: 'body',
+        footer: 'footer',
+        menu: 'menu',
       }
       renderCallback() {
         return (
@@ -820,12 +587,12 @@ const Component = withComponent()
       }
     }
 
-    class App extends Component<void> {
+    class App extends Component {
       renderCallback() {
         return h(
-          'my-page',
+          Page.is,
           {},
-          h('my-menu', {
+          h(Menu.is, {
             slot: Page.slots.menu,
             ref: _e => console.log(_e),
           }),
