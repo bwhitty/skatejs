@@ -8,8 +8,7 @@
     "strict": true,
     "sourceMap": true,
     "moduleResolution": "node",
-    // TODO @hotell
-    // "declaration": true,
+    "declaration": true,
     "jsx": "react",
     "jsxFactory": "h",
     "pretty": true,
@@ -17,10 +16,7 @@
   },
   "include": [
     "src/index.d.ts",
-    "src/ts-types/*",
+    "src/ts-types",
     "test/ts"
-  ],
-  "exclude": [
-    "node_modules"
   ]
 }
