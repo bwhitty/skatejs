@@ -1,9 +1,9 @@
 export type Mixed = {}
 export type Maybe<T> = T | null | undefined
 export type Constructor<T> = new (...args: any[]) => T
-export type CElement = Constructor<HTMLElement>
+export type ElementClass = typeof HTMLElement
 
-export type ComponentProps<El, T> = { [P in keyof T]: PropOptions }
+export type ComponentProps<T, E = ElementClass> = { [P in keyof T]: PropOptions }
 
 // NOTE:
 // - all classes are just ambient definitions (opaque types like), so consumer cannot use them directly
@@ -19,7 +19,7 @@ export declare class CustomElement extends HTMLElement {
 }
 export declare class Component<P = Mixed> extends CustomElement {}
 
-export declare class Children<P = Mixed> extends CustomElement {
+export declare class Children extends CustomElement {
   childrenChangedCallback(): void
 }
 
@@ -68,15 +68,14 @@ export declare class Unique extends CustomElement {
 }
 
 export type WithUnique = Constructor<Unique>
-export type WithRender = new <P>(...args: any[]) => Render<P>
-export type WithChildren = new <P>(...args: any[]) => Children<P>
+export type WithChildren = Constructor<Children>
 export type WithProps = new <P>(...args: any[]) => Props<P>
-// R -> Renderer
-export type WithComponent<R> = new <P = Mixed>(...args: any[]) => R &
+export type WithRender = new <P>(...args: any[]) => Render<P>
+export type WithComponent<Renderer> = new <P = Mixed>(...args: any[]) => Renderer &
   Component<P> &
-  Children<P> &
   Props<P> &
   Render<P> &
+  Children &
   Unique
 
 export interface PropOptions {

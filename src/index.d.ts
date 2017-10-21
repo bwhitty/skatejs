@@ -9,4 +9,4 @@ export as namespace skate
 export { prop, props, link, define, emit, withComponent, withProps, withRender, withUnique } from './ts-types/api'
 
 // Public types ( Unfortunately TS doesn't has Opaque Types like Flow )
-export { ComponentProps, PropOptions, Renderer } from './ts-types/types'
+export { ComponentProps, PropOptions, Renderer, CustomElement } from './ts-types/types'
